@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AbsentIA - Parent</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-text">Absent<span class="highlight">IA</span></span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="parent.html" class="nav-item active">
+                <i class="fas fa-home"></i> Tableau de bord
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-child"></i> Mes enfants
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-calendar-alt"></i> Absences
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-bell"></i> Notifications
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user"></i> Mon profil
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">MB</div>
+                <div class="user-details">
+                    <span class="user-name">Mohamed Benali</span>
+                    <span class="user-role">Parent</span>
+                </div>
+            </div>
+            <a href="index.html" class="nav-item logout">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Tableau de bord</h1>
+            </div>
+            <div class="header-right">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Children Selector -->
+        <div class="content-grid">
+            <div class="content-card full-width">
+                <div class="card-header">
+                    <h2 class="card-title">Mes enfants</h2>
+                </div>
+                <div class="children-list">
+                    <div class="child-card active" onclick="selectChild('Ahmed Hassan', 'GI2A')">
+                        <div class="child-avatar">AH</div>
+                        <div class="child-info">
+                            <div class="child-name">Ahmed Hassan</div>
+                            <div class="child-class">Génie Informatique 2A</div>
+                        </div>
+                        <div class="child-status">
+                            <span class="badge badge-success">Présent aujourd'hui</span>
+                        </div>
+                    </div>
+                    <div class="child-card" onclick="selectChild('Fatima Hassan', 'GE1A')">
+                        <div class="child-avatar">FH</div>
+                        <div class="child-info">
+                            <div class="child-name">Fatima Hassan</div>
+                            <div class="child-class">Génie Électrique 1A</div>
+                        </div>
+                        <div class="child-status">
+                            <span class="badge badge-warning">1 absence ce mois</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Child Dashboard (hidden by default) -->
+        <div id="childDashboard" class="content-grid" style="display: none;">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="childPresenceRate">98%</span>
+                        <span class="stat-label">Taux de présence</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-red">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="childAbsences">2</span>
+                        <span class="stat-label">Absences ce mois</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="childJustified">2</span>
+                        <span class="stat-label">Justificatifs validés</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Absences List -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title" id="childAbsencesTitle">Absences d'Ahmed Hassan</h2>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Cours</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                                <th>Justificatif</th>
+                            </tr>
+                        </thead>
+                        <tbody id="childAbsencesList">
+                            <tr>
+                                <td>Algorithmique Avancée</td>
+                                <td>20/04/2026</td>
+                                <td><span class="badge badge-warning">Non justifiée</span></td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>Bases de Données</td>
+                                <td>18/04/2026</td>
+                                <td><span class="badge badge-success">Justifiée</span></td>
+                                <td><span class="justificatif-status">Certificat médical</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title">Notifications</h2>
+                </div>
+                <div class="notification-list">
+                    <div class="notification-item">
+                        <div class="notification-icon bg-red">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p><strong>Absence non justifiée</strong> : Ahmed Hassan - Algorithmique Avancée (20/04/2026)</p>
+                            <span class="notification-time">Il y a 2h</span>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon bg-green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p><strong>Justificatif validé</strong> : Ahmed Hassan - Bases de Données (18/04/2026)</p>
+                            <span class="notification-time">Il y a 1 jour</span>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-icon bg-blue">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notification-content">
+                            <p><strong>Nouvelle absence</strong> : Fatima Hassan - Mathématiques (19/04/2026)</p>
+                            <span class="notification-time">Il y a 1 jour</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="scripts/script.js"></script>
+</body>
+</html>
