@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AbsentIA - Connexion</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo">
+                <span class="logo-text">Absent<span class="highlight">IA</span></span>
+                <p class="logo-subtitle">Gestion intelligente des absences</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="votre@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Mot de passe</label>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <select id="role" class="form-select" required>
+                        <option value="" disabled selected>Sélectionnez votre rôle</option>
+                        <option value="admin">Administrateur</option>
+                        <option value="teacher">Enseignant</option>
+                        <option value="student">Étudiant</option>
+                        <option value="parent">Parent</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+
+                <div class="form-footer">
+                    <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+                    <p class="signup-text">Nouvelle école ? <a href="#" class="signup-link">Contactez-nous</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts/script.js"></script>
+</body>
+</html>
