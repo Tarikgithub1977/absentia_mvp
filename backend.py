@@ -1,98 +1,76 @@
-from flask import Flask, request, jsonify
-import requests
-from datetime import datetime
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
-# Données simulées
+# Liste des étudiants
 students = [
-    {"id": 1, "name": "Ahmed Hassan", "email": "ahmed@emi.ac.ma", "class": "GI2A"},
-    {"id": 2, "name": "Fatima Khadija", "email": "fatima@emi.ac.ma", "class": "GI2A"},
-    {"id": 3, "name": "Youssef Mohamed", "email": "youssef@emi.ac.ma", "class": "GI2A"}
+    {"id": 1, "name": "Jean Dupont", "present": True},
+    {"id": 2, "name": "Marie Martin", "present": False},
 ]
 
-courses = [
-    {"id": 1, "name": "Algorithmique Avancée", "code": "ALG101", "teacher": "Prof. Karim"},
-    {"id": 2, "name": "Bases de Données", "code": "BDD101", "teacher": "Prof. Leila"},
-    {"id": 3, "name": "Réseaux Informatiques", "code": "RES101", "teacher": "Prof. Omar"}
+# Liste des professeurs
+teachers = [
+    {"id": 1, "name": "Pierre Dupuis"},
+    {"id": 2, "name": "Sophie Lambert"},
 ]
 
-absences = []
+# Liste des modules
+modules = [
+    {"id": 1, "name": "Mathématiques", "teacher_id": None},
+    {"id": 2, "name": "Physique", "teacher_id": None},
+]
 
-# Route pour tester le backend
-@app.route('/')
-def home():
-    return "Backend AbsentIA en cours d'exécution"
-
-# Route pour récupérer les étudiants
+# Endpoint pour récupérer les étudiants
 @app.route('/api/students', methods=['GET'])
 def get_students():
-    return jsonify({"success": True, "students": students})
+    return jsonify(students)
 
-# Route pour récupérer les cours
-@app.route('/api/courses', methods=['GET'])
-def get_courses():
-    return jsonify({"success": True, "courses": courses})
+# Endpoint pour ajouter un étudiant
+@app.route('/api/students', methods=['POST'])
+def add_student():
+    new_student = request.json
+    new_student['id'] = len(students) + 1
+    students.append(new_student)
+    return jsonify(new_student), 201
 
-# Route pour marquer une absence
-@app.route('/api/absences', methods=['POST'])
-def mark_absence():
-    data = request.json
-    absence = {
-        "id": len(absences) + 1,
-        "student_id": data.get("student_id"),
-        "course_id": data.get("course_id"),
-        "date": data.get("date", datetime.now().strftime("%Y-%m-%d")),
-        "status": data.get("status", "absent")
-    }
-    absences.append(absence)
-    return jsonify({"success": True, "absence": absence})
+# Endpoint pour modifier un étudiant
+@app.route('/api/students/<int:student_id>', methods=['PUT'])
+def update_student(student_id):
+    student = next((s for s in students if s['id'] == student_id), None)
+    if student is None:
+        return jsonify({"error": "Student not found"}), 404
+    student.update(request.json)
+    return jsonify(student)
 
-# Route pour récupérer les absences
-@app.route('/api/absences', methods=['GET'])
-def get_absences():
-    return jsonify({"success": True, "absences": absences})
+# Endpoint pour récupérer les professeurs
+@app.route('/api/teachers', methods=['GET'])
+def get_teachers():
+    return jsonify(teachers)
 
-# Route pour importer depuis Moodle (simulation)
-@app.route('/api/import/moodle', methods=['POST'])
-def import_from_moodle():
-    data = request.json
-    moodle_url = data.get("moodleUrl")
-    moodle_token = data.get("moodleToken")
+# Endpoint pour ajouter un professeur
+@app.route('/api/teachers', methods=['POST'])
+def add_teacher():
+    new_teacher = request.json
+    new_teacher['id'] = len(teachers) + 1
+    teachers.append(new_teacher)
+    return jsonify(new_teacher), 201
 
-    # Simulation de l'appel à l'API Moodle
-    try:
-        # Exemple : Récupérer les cours depuis Moodle
-        courses_response = requests.get(
-            f"{moodle_url}/webservice/rest/server.php",
-            params={
-                "wstoken": moodle_token,
-                "wsfunction": "core_course_get_courses",
-                "moodlewsrestformat": "json"
-            }
-        )
-        moodle_courses = courses_response.json() if courses_response.ok else []
+# Endpoint pour récupérer les modules
+@app.route('/api/modules', methods=['GET'])
+def get_modules():
+    return jsonify(modules)
 
-        # Exemple : Récupérer les étudiants depuis Moodle
-        students_response = requests.get(
-            f"{moodle_url}/webservice/rest/server.php",
-            params={
-                "wstoken": moodle_token,
-                "wsfunction": "core_enrol_get_enrolled_users",
-                "courseid": 1,  # ID d'un cours exemple
-                "moodlewsrestformat": "json"
-            }
-        )
-        moodle_students = students_response.json() if students_response.ok else []
-
-        return jsonify({
-            "success": True,
-            "message": "Import terminé avec succès",
-            "courses": moodle_courses,
-            "students": moodle_students
-        })
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+# Endpoint pour affecter un professeur à un module
+@app.route('/api/modules/<int:module_id>', methods=['PUT'])
+def assign_teacher_to_module(module_id):
+    module = next((m for m in modules if m['id'] == module_id), None)
+    if module is None:
+        return jsonify({"error": "Module not found"}), 404
+    teacher_id = request.json.get('teacher_id')
+    module['teacher_id'] = teacher_id
+    return jsonify(module)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
