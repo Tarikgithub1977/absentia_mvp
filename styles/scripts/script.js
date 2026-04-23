@@ -1,249 +1,224 @@
-// ===== Variables globales =====
-let currentCourse = "";
-let currentClass = "";
-let currentChild = "";
-
-// ===== DOM Elements =====
-const loginForm = document.getElementById("loginForm");
-const attendanceModal = document.getElementById("attendanceModal");
-const uploadModal = document.getElementById("uploadModal");
-const sidebar = document.querySelector(".sidebar");
-const menuToggle = document.querySelector(".menu-toggle");
-
-// ===== Événements =====
-if (loginForm) {
-    loginForm.addEventListener("submit", handleLogin);
-}
-
-if (menuToggle) {
-    menuToggle.addEventListener("click", toggleSidebar);
-}
-
-// ===== Fonctions =====
-function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const role = document.getElementById("role").value;
-
-    // Simulation de connexion (à remplacer par un vrai backend)
-    if (email && password && role) {
-        // Rediriger vers la page appropriée en fonction du rôle
-        switch (role) {
-            case "admin":
-                window.location.href = "dashboard.html";
-                break;
-            case "teacher":
-                window.location.href = "teacher.html";
-                break;
-            case "student":
-                window.location.href = "student.html";
-                break;
-            case "parent":
-                window.location.href = "parent.html";
-                break;
-            default:
-                alert("Rôle non reconnu");
+// Fonction pour charger les étudiants
+async function loadStudents() {
+    try {
+        const response = await fetch('http://localhost:5000/api/students');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    } else {
-        alert("Veuillez remplir tous les champs");
+        const students = await response.json();
+        displayStudents(students);
+    } catch (error) {
+        console.error('Erreur lors du chargement des étudiants:', error);
     }
 }
 
-function toggleSidebar() {
-    sidebar.classList.toggle("open");
-}
-
-// ===== Fonctions pour l'interface Enseignant =====
-function markAttendance(course, className) {
-    currentCourse = course;
-    currentClass = className;
-
-    // Mettre à jour le titre du modal
-    document.getElementById("modalCourseTitle").textContent = `Marquer les présences - ${course}`;
-    document.getElementById("modalClass").textContent = className;
-    document.getElementById("modalDate").textContent = new Date().toLocaleDateString("fr-FR");
-
-    // Afficher le modal
-    attendanceModal.style.display = "flex";
-}
-
-function closeModal() {
-    attendanceModal.style.display = "none";
-}
-
-function saveAttendance() {
-    // Récupérer toutes les radios cochées
-    const attendanceData = [];
-    const radioGroups = document.querySelectorAll('.attendance-options input[type="radio"]:checked');
-
-    radioGroups.forEach(radio => {
-        const studentName = radio.closest('.student-attendance').querySelector('.student-name').textContent;
-        attendanceData.push({
-            student: studentName,
-            status: radio.value
-        });
-    });
-
-    // Simulation d'envoi au serveur
-    console.log("Données d'absence enregistrées :", {
-        course: currentCourse,
-        class: currentClass,
-        date: new Date().toISOString(),
-        attendance: attendanceData
-    });
-
-    // Fermer le modal
-    closeModal();
-
-    // Afficher un message de succès
-    alert(`Présences enregistrées pour ${currentCourse} (${currentClass}) !`);
-}
-
-// ===== Fonctions pour l'interface Étudiant =====
-function openUploadModal(course, date) {
-    document.getElementById("uploadModalTitle").textContent = `Upload justificatif - ${course} (${date})`;
-    uploadModal.style.display = "flex";
-}
-
-function closeUploadModal() {
-    uploadModal.style.display = "none";
-}
-
-function submitJustificatif() {
-    const type = document.getElementById("justificatifType").value;
-    const file = document.getElementById("justificatifFile").files[0];
-    const comment = document.getElementById("justificatifComment").value;
-
-    if (!file) {
-        alert("Veuillez sélectionner un fichier");
-        return;
-    }
-
-    // Simulation d'envoi au serveur
-    console.log("Justificatif envoyé :", {
-        type,
-        file: file.name,
-        comment,
-        course: document.getElementById("uploadModalTitle").textContent
-    });
-
-    // Fermer le modal
-    closeUploadModal();
-
-    // Afficher un message de succès
-    alert("Justificatif envoyé avec succès ! Il sera validé par l'administration sous 24h.");
-}
-
-// ===== Fonctions pour l'interface Parent =====
-function selectChild(name, className) {
-    currentChild = name;
-
-    // Mettre à jour le tableau de bord
-    document.getElementById("childDashboard").style.display = "grid";
-    document.getElementById("childAbsencesTitle").textContent = `Absences de ${name}`;
-
-    // Simulation de données (à remplacer par un appel API)
-    const absencesList = document.getElementById("childAbsencesList");
-    absencesList.innerHTML = `
-        <tr>
-            <td>Algorithmique Avancée</td>
-            <td>20/04/2026</td>
-            <td><span class="badge badge-warning">Non justifiée</span></td>
-            <td>-</td>
-        </tr>
-        <tr>
-            <td>Bases de Données</td>
-            <td>18/04/2026</td>
-            <td><span class="badge badge-success">Justifiée</span></td>
-            <td><span class="justificatif-status">Certificat médical</span></td>
-        </tr>
-    `;
-
-    // Mettre à jour les stats
-    document.getElementById("childPresenceRate").textContent = "98%";
-    document.getElementById("childAbsences").textContent = "2";
-    document.getElementById("childJustified").textContent = "1";
-}
-
-function initCharts() {
-    // Chart pour le tableau de bord admin
-    if (document.getElementById("attendanceChart")) {
-        const ctx = document.getElementById("attendanceChart").getContext("2d");
-        new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
-                datasets: [{
-                    label: "Taux de présence (%)",
-                    data: [95, 92, 98, 90, 88, 95, 97],
-                    borderColor: "rgba(59, 130, 246, 1)",
-                    backgroundColor: "rgba(59, 130, 246, 0.1)",
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true
-                }]
+// Fonction pour ajouter un étudiant
+async function addStudent(name) {
+    try {
+        const response = await fetch('http://localhost:5000/api/students', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 80,
-                        max: 100
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
+            body: JSON.stringify({ name: name, present: true }),
         });
-    }
-
-    // Chart pour l'interface étudiant
-    if (document.getElementById("studentChart")) {
-        const ctx = document.getElementById("studentChart").getContext("2d");
-        new Chart(ctx, {
-            type: "doughnut",
-            data: {
-                labels: ["Présences", "Absences justifiées", "Absences non justifiées"],
-                datasets: [{
-                    data: [12, 2, 1],
-                    backgroundColor: [
-                        "rgba(16, 185, 129, 0.8)",
-                        "rgba(245, 158, 11, 0.8)",
-                        "rgba(239, 68, 68, 0.8)"
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: "bottom"
-                    }
-                }
-            }
-        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const newStudent = await response.json();
+        console.log('Étudiant ajouté:', newStudent);
+        loadStudents(); // Recharge la liste des étudiants
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout de l\'étudiant:', error);
     }
 }
 
-// Initialiser les graphiques au chargement de la page
-document.addEventListener("DOMContentLoaded", () => {
-    initCharts();
-
-    // Fermer les modals en cliquant à l'extérieur
-    window.addEventListener("click", (e) => {
-        if (e.target === attendanceModal) {
-            closeModal();
-        }
-        if (e.target === uploadModal) {
-            closeUploadModal();
-        }
+// Fonction pour afficher les étudiants
+function displayStudents(students) {
+    const studentsList = document.getElementById('students-list');
+    studentsList.innerHTML = '';
+    students.forEach(student => {
+        const studentElement = document.createElement('div');
+        studentElement.innerHTML = `
+            <p>${student.name} <input type="checkbox" ${student.present ? 'checked' : ''} onchange="markAbsent(${student.id}, this.checked)"></p>
+        `;
+        studentsList.appendChild(studentElement);
     });
-});
+}
+
+// Fonction pour marquer un étudiant comme absent
+async function markAbsent(studentId, isPresent) {
+    try {
+        const response = await fetch(`http://localhost:5000/api/students/${studentId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ present: isPresent }),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const updatedStudent = await response.json();
+        console.log('Statut de présence mis à jour:', updatedStudent);
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour du statut de présence:', error);
+    }
+}
+
+// Fonction pour charger les professeurs
+async function loadTeachers() {
+    try {
+        const response = await fetch('http://localhost:5000/api/teachers');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const teachersData = await response.json();
+        window.teachers = teachersData; // Stocker les professeurs dans une variable globale
+        displayTeachers(teachersData);
+    } catch (error) {
+        console.error('Erreur lors du chargement des professeurs:', error);
+    }
+}
+
+// Fonction pour ajouter un professeur
+async function addTeacher(name) {
+    try {
+        const response = await fetch('http://localhost:5000/api/teachers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name: name }),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const newTeacher = await response.json();
+        console.log('Professeur ajouté:', newTeacher);
+        loadTeachers(); // Recharge la liste des professeurs
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout du professeur:', error);
+    }
+}
+
+// Fonction pour afficher les professeurs
+function displayTeachers(teachers) {
+    const teachersList = document.getElementById('teachers-list');
+    teachersList.innerHTML = '';
+    teachers.forEach(teacher => {
+        const teacherElement = document.createElement('div');
+        teacherElement.innerHTML = `
+            <p>${teacher.name}</p>
+        `;
+        teachersList.appendChild(teacherElement);
+    });
+}
+
+// Fonction pour charger les modules
+async function loadModules() {
+    try {
+        const response = await fetch('http://localhost:5000/api/modules');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const modules = await response.json();
+        displayModules(modules);
+    } catch (error) {
+        console.error('Erreur lors du chargement des modules:', error);
+    }
+}
+
+// Fonction pour afficher les modules
+function displayModules(modules) {
+    const modulesList = document.getElementById('modules-list');
+    modulesList.innerHTML = '';
+    modules.forEach(module => {
+        const moduleElement = document.createElement('div');
+        const teacherName = getTeacherName(module.teacher_id);
+        moduleElement.innerHTML = `
+            <p>${module.name} - Professeur: ${teacherName || 'Non affecté'}</p>
+            <select onchange="assignTeacherToModule(${module.id}, this.value)">
+                <option value="">Sélectionnez un professeur</option>
+                ${getTeacherOptions(module.teacher_id)}
+            </select>
+        `;
+        modulesList.appendChild(moduleElement);
+    });
+}
+
+// Fonction pour obtenir le nom d'un professeur
+function getTeacherName(teacherId) {
+    if (!window.teachers) return null;
+    const teacher = window.teachers.find(t => t.id == teacherId);
+    return teacher ? teacher.name : null;
+}
+
+// Fonction pour obtenir les options des professeurs
+function getTeacherOptions(selectedTeacherId) {
+    if (!window.teachers) return '';
+    let options = '';
+    window.teachers.forEach(teacher => {
+        const selected = teacher.id == selectedTeacherId ? 'selected' : '';
+        options += `<option value="${teacher.id}" ${selected}>${teacher.name}</option>`;
+    });
+    return options;
+}
+
+// Fonction pour affecter un professeur à un module
+async function assignTeacherToModule(moduleId, teacherId) {
+    try {
+        const response = await fetch(`http://localhost:5000/api/modules/${moduleId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ teacher_id: teacherId }),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const updatedModule = await response.json();
+        console.log('Module mis à jour:', updatedModule);
+        loadModules(); // Recharge la liste des modules
+    } catch (error) {
+        console.error('Erreur lors de l\'affectation du professeur:', error);
+    }
+}
+
+// Fonction pour configurer le formulaire d'ajout d'étudiant
+function setupAddStudentForm() {
+    const form = document.getElementById('add-student-form');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        const nameInput = document.getElementById('student-name');
+        const name = nameInput.value.trim();
+        if (name) {
+            addStudent(name);
+            nameInput.value = '';
+        }
+    };
+}
+
+// Fonction pour configurer le formulaire d'ajout de professeur
+function setupAddTeacherForm() {
+    const form = document.getElementById('add-teacher-form');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        const nameInput = document.getElementById('teacher-name');
+        const name = nameInput.value.trim();
+        if (name) {
+            addTeacher(name);
+            nameInput.value = '';
+        }
+    };
+}
+
+// Appeler les fonctions au chargement de la page
+window.onload = function() {
+    loadStudents();
+    loadTeachers();
+    loadModules();
+    setupAddStudentForm();
+    setupAddTeacherForm();
+};
