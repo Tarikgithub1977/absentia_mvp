@@ -3,49 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Étudiants et Professeurs</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .section {
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        button, input, select {
-            padding: 8px;
-            margin: 5px;
-        }
-    </style>
+    <title>AbsentIA - Enseignant</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <h1>Gestion des Étudiants</h1>
-    <div class="section">
-        <h2>Liste des Étudiants</h2>
-        <div id="students-list"></div>
-        <form id="add-student-form">
-            <input type="text" id="student-name" placeholder="Nom de l'étudiant" required>
-            <button type="submit">Ajouter Étudiant</button>
-        </form>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-text">Absent<span class="highlight">IA</span></span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item">
+                <i class="fas fa-home"></i> Tableau de bord
+            </a>
+            <a href="teacher.html" class="nav-item active">
+                <i class="fas fa-chalkboard-teacher"></i> Mes cours
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-calendar-alt"></i> Planning
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-file-alt"></i> Justificatifs
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-chart-bar"></i> Statistiques
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">PR</div>
+                <div class="user-details">
+                    <span class="user-name">Prof. Karim</span>
+                    <span class="user-role">Enseignant</span>
+                </div>
+            </div>
+            <a href="index.html" class="nav-item logout">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </a>
+        </div>
     </div>
 
-    <h1>Gestion des Professeurs</h1>
-    <div class="section">
-        <h2>Liste des Professeurs</h2>
-        <div id="teachers-list"></div>
-        <form id="add-teacher-form">
-            <input type="text" id="teacher-name" placeholder="Nom du professeur" required>
-            <button type="submit">Ajouter Professeur</button>
-        </form>
-    </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <button class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Mes cours</h1>
+            </div>
+            <div class="header-right">
+                <div class="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">1</span>
+                </div>
+            </div>
+        </header>
 
-    <h1>Gestion des Modules</h1>
-    <div class="section">
-        <h2>Liste des Modules</h2>
-        <div id="modules-list"></div>
+        <!-- Course List -->
+        <div class="content-grid">
+            <div class="content-card full-width">
+                <div class="card-header">
+                    <h2 class="card-title">Cours d'aujourd'hui</h2>
+                    <div class="date-picker">
+                        <input type="date" id="courseDate" value="2026-04-22">
+                    </div>
+                </div>
+
+                <div class="course-list">
+                    <div class="course-item">
+                        <div class="course-info">
+                            <div class="course-time">08:30 - 10:00</div>
+                            <div class="course-name">Algorithmique Avancée</div>
+                            <div class="course-class">Génie Informatique 2A (Salle B101)</div>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary btn-sm" onclick="markAttendance('Algorithmique Avancée', 'Génie Informatique 2A')">
+                                <i class="fas fa-user-check"></i> Marquer les présences
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="course-item">
+                        <div class="course-info">
+                            <div class="course-time">10:15 - 12:00</div>
+                            <div class="course-name">Bases de Données</div>
+                            <div class="course-class">Génie Informatique 1A (Salle B102)</div>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary btn-sm" onclick="markAttendance('Bases de Données', 'Génie Informatique 1A')">
+                                <i class="fas fa-user-check"></i> Marquer les présences
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="course-item">
+                        <div class="course-info">
+                            <div class="course-time">14:00 - 15:30</div>
+                            <div class="course-name">Réseaux Informatiques</div>
+                            <div class="course-class">Génie Informatique 3A (Salle B201)</div>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary btn-sm" onclick="markAttendance('Réseaux Informatiques', 'Génie Informatique 3A')">
+                                <i class="fas fa-user-check"></i> Marquer les présences
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Modal (hidden by default) -->
+            <div id="attendanceModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="modalCourseTitle">Marquer les présences - Algorithmique Avancée</h2>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="attendance-date">
+                            <strong>Date :</strong> <span id="modalDate">22/04/2026</span>
+                        </div>
+                        <div class="attendance-class">
+                            <strong>Classe :</strong> <span id="modalClass">Génie Informatique 2A</span>
+                        </div>
+
+                        <div class="student-list">
+                            <div class="student-attendance">
+                                <div class="student-info">
+                                    <div class="student-avatar">AH</div>
+                                    <span class="student-name">Ahmed Hassan</span>
+                                </div>
+                                <div class="attendance-options">
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_AH" value="present" checked>
+                                        <span class="option-label present">Présent</span>
+                                    </label>
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_AH" value="absent">
+                                        <span class="option-label absent">Absent</span>
+                                    </label>
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_AH" value="excused">
+                                        <span class="option-label excused">Excusé</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="student-attendance">
+                                <div class="student-info">
+                                    <div class="student-avatar">FK</div>
+                                    <span class="student-name">Fatima Khadija</span>
+                                </div>
+                                <div class="attendance-options">
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_FK" value="present">
+                                        <span class="option-label present">Présent</span>
+                                    </label>
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_FK" value="absent" checked>
+                                        <span class="option-label absent">Absent</span>
+                                    </label>
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_FK" value="excused">
+                                        <span class="option-label excused">Excusé</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="student-attendance">
+                                <div class="student-info">
+                                    <div class="student-avatar">YM</div>
+                                    <span class="student-name">Youssef Mohamed</span>
+                                </div>
+                                <div class="attendance-options">
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_YM" value="present" checked>
+                                        <span class="option-label present">Présent</span>
+                                    </label>
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_YM" value="absent">
+                                        <span class="option-label absent">Absent</span>
+                                    </label>
+                                    <label class="attendance-option">
+                                        <input type="radio" name="attendance_YM" value="excused">
+                                        <span class="option-label excused">Excusé</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveAttendance()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="scripts/script.js"></script>
